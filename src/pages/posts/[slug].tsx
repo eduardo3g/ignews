@@ -1,9 +1,9 @@
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import { getSession } from "next-auth/client";
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
+import { getSession } from 'next-auth/client';
 import { RichText } from "prismic-dom";
 
-import { getPrismicClient } from "../../services/prismic";
+import { getPrismicClient } from '../../services/prismic';
 
 import styles from './post.module.scss';
 
@@ -36,12 +36,34 @@ export default function Post({ post }: PostProps) {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
-  const session = getSession({ req });
+  const session: any = await getSession({ req });
   const { slug } = params;
+
+  if (!session.activeSubscription) {
+    return {
+       redirect: {
+         destination: '/',
+         permanent: false,
+       },
+    };
+  }
 
   const prismic = getPrismicClient(req);
 
   const response = await prismic.getByUID('post', String(slug), {});
+
+  if (!response) {
+    return {
+      props: {
+        post: {
+          slug: 'Could not load the slug',
+          title: 'Could not load the title',
+          content: 'Could not load the content',
+          updatedAt: 'Could not load the creation date',
+        },
+      },
+    };
+  }
 
   const post = {
     slug,
