@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useSession } from 'next-auth/client';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -57,9 +57,11 @@ export default function PostPreview({ post }: PostPreviewProps) {
   );
 };
 
-export const getStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [],
+    paths: [
+      { params: { slug: 'saas-single-tenant-ou-multi-tenant-qual-escolher' } }
+    ],
     fallback: 'blocking',
   };
 }
@@ -99,5 +101,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       post,
     },
+
   };
 };
